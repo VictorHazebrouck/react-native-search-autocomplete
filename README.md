@@ -4,7 +4,7 @@
 
 | **Option** 	| **Description** 	                                                                                               | **Type** 	| **Default** 	                                 |
 |---	|-----------------------------------------------------------------------------------------------------------------|---	|-----------------------------------------------|
-| `onInputChange` 	| set of list items 	                                                                                             | function(input) 	|  	                                        |
+| `onInputChange` 	| Receive input string. Return an array of objects with for each at least a "_searchName" key. "_searchName" represents the string that will be displayed in the suggestions list.                                                           | function(string) 	|  	                                        |
 | `onResultSelection` 	| string (**id**) or object that contain **id** 	                                                                 | function(object) 	|                                        |
 | `minChar` 	| loading state 	                                                                                                 | number 	| 3 	                                       |
 | `maxResults` 	| whether use local filter by dataSet (useful set to false for remote filtering to prevent rerender twice) 	      | number 	| true 	                                        |
