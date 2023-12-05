@@ -1,33 +1,28 @@
 import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useState, useEffect } from 'react';
 
 
 const SearchContainer = ({ onInputChange, onResultSelection, minChar = 3, maxResults, placeholder, debounceTimer = 200, inputStyle = {}, resultsStyle = {}, }) => {
-    if (!inputStyle.height) inputStyle.height = 50
     const styles = mergeStyles(defaultStyles, inputStyle, resultsStyle)
+    if (!inputStyle.height) inputStyle.height = 50
     const [input, setInput] = useState('')
     const [isVisible, setIsVisible] = useState(false)
     const [list, setList] = useState([])
+    let searchSuggestions = []
 
-
-    //on Input change, send Input value to parent if no change for 'debounceTimer' ms, receive computed values. 
+    //on Input change, send Input value to parent after no change for x ms since last keystroke, receive computed Array. 
     //map over items provided by parent to save data within components,
-    //and display only their values from "searchName" key in suggestions.
+    //and display only their values from "_searchName" key in suggestions.
     useEffect(() => {
         if (input.length === 0) setIsVisible(false)
         if (input.length < minChar) { setList([]); setIsVisible(false); return }
 
         const timeoutId = setTimeout(async () => {
             const data = await onInputChange(input)
-            const results = data.map((e, i) => {
-                return (
-                    <TouchableOpacity onPress={() => handleClick(e)} style={styles.results} key={i}>
-                        <Text style={{ fontSize: 25 }}>{e._searchName}</Text>
-                    </TouchableOpacity>)
-            })
-            setList(results)
+            if (maxResults) data.splice(maxResults)
+            setList(data)
             setIsVisible(true)
         }, debounceTimer);
 
@@ -38,22 +33,32 @@ const SearchContainer = ({ onInputChange, onResultSelection, minChar = 3, maxRes
     const handleClick = (data) => {
         setInput('')
         setIsVisible(false)
+        Keyboard.dismiss()
         onResultSelection(data)
     }
 
+    searchSuggestions = list.map((e, i) => {
+        return (
+            <TouchableOpacity onPress={() => handleClick(e)} style={styles.results} activeOpacity={1} key={i}>
+                <Text>{e._searchName}</Text>
+            </TouchableOpacity>)
+    })
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { height: inputStyle.height }]}>
             <View style={[styles.inputContainer, { height: inputStyle.height }]}>
                 <TextInput
-                    style={[styles.input, { height: inputStyle.height }]}
+                    style={styles.input}
                     placeholder={placeholder}
                     onChangeText={(value) => setInput(value)}
                     value={input}
                 />
-                <FontAwesome name={isVisible ? "chevron-up" : "chevron-down"} size={20} color='gray' onPress={() => setIsVisible(!isVisible)} />
+                <TouchableOpacity onPress={() => setIsVisible(!isVisible)} activeOpacity={1}>
+                    <FontAwesome name={isVisible ? "chevron-up" : "chevron-down"} size={20} color='gray' />
+                </TouchableOpacity>
             </View>
             <View style={styles.resultsContainer}>
-                {isVisible && list}
+                {isVisible && searchSuggestions}
             </View>
         </View>
     );
@@ -83,6 +88,8 @@ const defaultStyles = StyleSheet.create({
         paddingLeft: 15,
         borderRadius: 4,
         marginBottom: 3,
+        borderWidth: 1,
+        borderColor: '#D3D3D3',
     },
     resultsContainer: {
         borderRadius: 4,
@@ -98,6 +105,8 @@ const defaultStyles = StyleSheet.create({
         borderColor: 'gray',
         borderBottomWidth: 1,
         paddingLeft: 20,
+        fontSize: 25,
+        activeOpacity: 1,
     }
 });
 

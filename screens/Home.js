@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import SearchContainer from '../components/SearchContainer';
 import { useState } from 'react';
 
@@ -38,7 +38,6 @@ export default function Home() {
         onInputChange={handleInputChange}
         onResultSelection={handleSelection}
         minChar={3}
-        maxResults={4}
         resultsKey={'properties.name'}
         placeholder={"Search city"}
       />
@@ -54,7 +53,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     alignItems: 'stretch',
     padding: 20,
-    backgroundColor: 'black',
+    backgroundColor: '#FFF5E1',
   },
   resultItem: {
     height: 100, 
